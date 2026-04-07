@@ -1,5 +1,6 @@
 ---
 import { readData } from '../lib/readData';
+import { blogIndexUrl } from '../lib/blogRoutes';
 import { getCollection } from 'astro:content';
 import HeadPlugins from '../plugins/_slots/HeadPlugins.astro';
 import BodyEndPlugins from '../plugins/_slots/BodyEndPlugins.astro';
@@ -161,7 +162,7 @@ const socialImage = image?.startsWith('http') ? image : image ? new URL(image, s
         )) : (
           <>
             <a href="/" class="text-sm font-medium text-gray-700 hover:text-[--color-primary] transition-colors">Home</a>
-            <a href="/blog" class="text-sm font-medium text-gray-700 hover:text-[--color-primary] transition-colors">Blog</a>
+            <a href={blogIndexUrl()} class="text-sm font-medium text-gray-700 hover:text-[--color-primary] transition-colors">Blog</a>
             <a href="/sobre" class="text-sm font-medium text-gray-700 hover:text-[--color-primary] transition-colors">Sobre</a>
             <a href="/contato" class="text-sm font-medium text-gray-700 hover:text-[--color-primary] transition-colors">Contato</a>
           </>
@@ -197,7 +198,7 @@ const socialImage = image?.startsWith('http') ? image : image ? new URL(image, s
         )) : (
           <>
             <a href="/" class="text-sm font-medium text-gray-700 py-1">Home</a>
-            <a href="/blog" class="text-sm font-medium text-gray-700 py-1">Blog</a>
+            <a href={blogIndexUrl()} class="text-sm font-medium text-gray-700 py-1">Blog</a>
             <a href="/sobre" class="text-sm font-medium text-gray-700 py-1">Sobre</a>
             <a href="/contato" class="text-sm font-medium text-gray-700 py-1">Contato</a>
           </>
