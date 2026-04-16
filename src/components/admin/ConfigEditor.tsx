@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, AlertCircle, Loader2, Image as ImageIcon, Link2, CheckCircle2 } from 'lucide-react';
+import { Save, AlertCircle, Loader2, Image as ImageIcon } from 'lucide-react';
 import { triggerToast } from './CmsToaster';
 import { githubApi } from '../../lib/adminApi';
 
@@ -20,7 +20,7 @@ export default function ConfigEditor() {
 
     useEffect(() => {
         githubApi('read', 'src/data/siteConfig.json')
-            .then(data => { setConfig(JSON.parse(data.content)); setFileSha(data.sha); })
+            .then(data => { setConfig(JSON.parse(data?.content || "{}")); setFileSha(data.sha); })
             .catch(err => setError(err.message))
             .finally(() => setLoading(false));
     }, []);
@@ -179,40 +179,6 @@ export default function ConfigEditor() {
                 </div>
             </div>
 
-            {/* Estrutura de URL dos Posts */}
-            <div className="p-8 bg-white border border-slate-200 rounded-2xl shadow-sm">
-                <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4 flex items-center gap-2"><Link2 className="w-5 h-5 text-amber-600" /> Estrutura de URL dos Posts</h3>
-                <p className="text-sm text-slate-500 mb-4">Define como as URLs dos seus artigos serão exibidas no site.</p>
-                <div className="space-y-3">
-                    {[
-                        { value: '', label: 'URL Limpa', example: 'meusite.com/titulo-do-post', desc: 'Similar ao WordPress — sem prefixo' },
-                        { value: '/blog', label: 'Com /blog', example: 'meusite.com/blog/titulo-do-post', desc: 'Posts dentro da pasta /blog' },
-                    ].map(option => (
-                        <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => setConfig({ ...config, blogPrefix: option.value })}
-                            className={`w-full text-left p-4 rounded-2xl border transition-all ${(config?.blogPrefix ?? '') === option.value ? 'border-violet-500 bg-violet-50/50 ring-1 ring-violet-500' : 'border-slate-100 hover:border-slate-200'}`}
-                        >
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="font-bold text-sm text-slate-800">{option.label}</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">{option.desc}</p>
-                                    <p className="text-xs font-mono text-violet-500 mt-1 bg-violet-50 inline-block px-2 py-0.5 rounded">{option.example}</p>
-                                </div>
-                                {(config?.blogPrefix ?? '') === option.value && <CheckCircle2 className="w-5 h-5 text-violet-500 shrink-0" />}
-                            </div>
-                        </button>
-                    ))}
-                </div>
-                <div className="flex gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100 mt-4">
-                    <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                    <p className="text-xs text-amber-700 leading-relaxed font-medium">
-                        Alterar esta opção muda todas as URLs dos posts. Se o site já estiver indexado, configure <strong>redirects 301</strong> para evitar perda de SEO.
-                    </p>
-                </div>
-            </div>
-
             {/* Informações de Contato */}
             <div className="p-8 bg-white border border-slate-200 rounded-2xl shadow-sm">
                 <h3 className="text-xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">Informações de Contato</h3>
@@ -261,6 +227,30 @@ export default function ConfigEditor() {
                 <div className="space-y-4">
                     <div><label className={labelClass}>Título Padrão (SEO)</label><input type="text" value={config?.seo?.title || ''} onChange={e => setConfig({ ...config, seo: { ...config.seo, title: e.target.value } })} className={inputClass} /></div>
                     <div><label className={labelClass}>Descrição Padrão</label><textarea rows={3} value={config?.seo?.description || ''} onChange={e => setConfig({ ...config, seo: { ...config.seo, description: e.target.value } })} className={`${inputClass} resize-y`} /></div>
+                </div>
+            </div>
+
+            {/* Sitemap */}
+            <div className="p-8 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                <h3 className="text-xl font-bold text-slate-900 mb-8 border-b border-slate-100 pb-4">Sitemap</h3>
+                <div className="space-y-4">
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                        <p className="text-sm font-bold text-emerald-700 mb-1">Sitemap XML gerado automaticamente</p>
+                        <p className="text-xs text-emerald-600 mb-3">O sitemap é atualizado a cada build/deploy com todas as páginas e posts do site.</p>
+                        {config?.url ? (
+                            <div className="space-y-2">
+                                <a href={`${config.url.replace(/\/$/, '')}/sitemap-index.xml`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-bold text-emerald-700 bg-white px-4 py-2 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                    {config.url.replace(/\/$/, '')}/sitemap-index.xml
+                                </a>
+                                <p className="text-xs text-slate-500">Use esta URL no Google Search Console para enviar seu sitemap.</p>
+                            </div>
+                        ) : (
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                                <p className="text-xs text-amber-700 font-medium">Configure a URL do Site acima para ver o link do sitemap.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </form>
